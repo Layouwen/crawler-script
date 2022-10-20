@@ -3,10 +3,11 @@ import * as path from 'path';
 import { subject_id } from './config';
 import request from './utils/request';
 
-const outputPath = path.resolve(__dirname, '../output');
+const outputPath = path.resolve(__dirname, '../output/马克思主义/历史真题');
 
 enum CategoryName {
-  CHOICE = '单项选择题',
+  CHOICE1 = '单项选择题',
+  CHOICE2 = '单选题',
   SUBJECTIVE = '主观题'
 }
 
@@ -52,6 +53,48 @@ const getErrorTopicAnalysisPageList = async (sheet_id: string) => {
   };
 };
 
+const getExamPaperPageList2 = async () => {
+  const res = await request.get('https://ios.api.daniujiaoyu.org/pc/api/pcweb/exampaper/getexampaperpagelist', {
+    params: {
+      page: 1,
+      limit: 9999,
+      subject_id,
+      plate: 802,
+    },
+  }) as {
+    data: {
+      list: {
+        name: string;
+        paper_id: string;
+      }[];
+    }
+  };
+  return res.data.list;
+};
+
+const getExamPaperTopicPageList = async (paper_id: string) => {
+  const res = await request.get('https://ios.api.daniujiaoyu.org/pc/api/pcweb/exampaper/getexampapertopicpagelist', {
+    params: {
+      page: 1,
+      limit: 9999,
+      paper_id,
+    },
+  }) as {
+    data: {
+      paper: {
+        name: string;
+      },
+      list: AAA[]
+    }
+  };
+  return res.data as {
+    paper: {
+      name: string
+    },
+    list: AAA[]
+  };
+};
+
 const getTemplate = (data: any, hasNo = false) => {
   const {
     topic_no,
@@ -69,12 +112,18 @@ const getTemplate = (data: any, hasNo = false) => {
   return title + items + bottom;
 };
 
-const outputList = async (name: string, sheet_id: string) => {
+const outputList = async ({name = '', sheet_id = '', paper_id = ''}) => {
   if (!fs.existsSync(outputPath)) {
     fs.mkdirSync(outputPath);
   }
 
-  const data = await getErrorTopicAnalysisPageList(sheet_id);
+  let data
+  if (sheet_id) {
+    data = await getErrorTopicAnalysisPageList(sheet_id);
+  }
+  if (paper_id) {
+    data = await getExamPaperTopicPageList(paper_id)
+  }
 
   if (data?.list) {
     generateChoice(name, data.list);
@@ -84,7 +133,7 @@ const outputList = async (name: string, sheet_id: string) => {
 
 const generateChoice = (title: string, list: AAA[]) => {
   const listData = list
-    .filter(l => l.category_name === CategoryName.CHOICE)
+    .filter(l => l.category_name.includes(CategoryName.CHOICE1) || l.category_name.includes(CategoryName.CHOICE2))
     .map(({topic_no, topic_title, answer, itemList, analysis}) => ({
       topic_no,
       topic_title,
@@ -97,7 +146,7 @@ const generateChoice = (title: string, list: AAA[]) => {
 
   fs.writeFile(path.resolve(outputPath, `${title}.txt`), str, (err) => {
     if (err) {
-      console.log(err)
+      console.log(err);
     }
   });
 };
@@ -105,6 +154,16 @@ const generateChoice = (title: string, list: AAA[]) => {
 !(async function () {
   const paperList = await getExamPaperPageList();
   paperList.forEach(p => {
-    void outputList(p.name, p.sheet_id);
+    void outputList({
+      name: p.name,
+      sheet_id: p.sheet_id
+    });
+  });
+  const data = await getExamPaperPageList2();
+  data.forEach(p => {
+    void outputList({
+      name: p.name,
+      paper_id: p.paper_id
+    });
   });
 })();
