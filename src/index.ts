@@ -14,12 +14,13 @@ const getExamPaperPageList = async () => {
   const res = await request.get('https://ios.api.daniujiaoyu.org/pc/api/pcweb/exampaper/getexampaperpagelist', {
     params: {
       page: 1,
-      limit: 10,
+      limit: 999,
       subject_id,
       plate: 801,
     },
   });
   return res.data.list as {
+    name: string;
     sheet_id: string
   }[];
 };
@@ -68,14 +69,16 @@ const getTemplate = (data: any, hasNo = false) => {
   return title + items + bottom;
 };
 
-const outputList = async (sheet_id: string) => {
+const outputList = async (name: string, sheet_id: string) => {
   if (!fs.existsSync(outputPath)) {
     fs.mkdirSync(outputPath);
   }
 
   const data = await getErrorTopicAnalysisPageList(sheet_id);
 
-  generateChoice(data.paper.name, data.list);
+  if (data?.list) {
+    generateChoice(name, data.list);
+  }
   return 'success';
 };
 
@@ -92,12 +95,16 @@ const generateChoice = (title: string, list: AAA[]) => {
   const titleStr = `${title}（选择题）\n\n`;
   const str = titleStr + listData.map(l => getTemplate(l)).join('\n');
 
-  fs.writeFile(path.resolve(outputPath, `${title}.txt`), str, (err) => console.log(err));
+  fs.writeFile(path.resolve(outputPath, `${title}.txt`), str, (err) => {
+    if (err) {
+      console.log(err)
+    }
+  });
 };
 
 !(async function () {
   const paperList = await getExamPaperPageList();
   paperList.forEach(p => {
-    void outputList(p.sheet_id);
+    void outputList(p.name, p.sheet_id);
   });
 })();
