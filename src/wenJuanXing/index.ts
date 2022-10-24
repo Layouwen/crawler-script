@@ -9,8 +9,13 @@ let output = '';
 const $items = document.querySelectorAll('.data__items');
 Array.from($items).forEach(i => {
   const $title = i.querySelector('.data__tit_cjd');
-  const title = $title.childNodes[0].data;
-  if (!questionTypeArr.some(q => title.includes(q)) && !title.includes('您的姓名')) {
+  let title;
+  if ($title.childNodes[0].tagName === 'LABEL') {
+    title = $title.childNodes[1].data;
+  } else {
+    title = $title.childNodes[0].data;
+  }
+  if (!questionTypeArr.some(q => title.includes(q)) && !title.includes('您的姓名') && !title.includes('联系电话')) {
     const options = [];
 
     const $right = i.querySelector('.judge_ques_right');
@@ -30,8 +35,19 @@ Array.from($items).forEach(i => {
       const $rightAnswer = i.querySelector('.answer-ansys');
       answer = $rightAnswer.childNodes[1].innerText[0];
     }
+
+    let jiexi;
+    const $jiexi = i.querySelector('.jixi_content_box > .jiexi-content');
+    if ($jiexi) {
+      jiexi = $jiexi.innerText;
+    }
+
     output += `${title}(${answer})\n`;
-    output += options.join('\n') + '\n\n';
+    output += options.join('\n') + '\n';
+    if (jiexi) {
+      output += `解析：${jiexi}\n`;
+    }
+    output += '\n';
   }
 });
 console.log(output);
