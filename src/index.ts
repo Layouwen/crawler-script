@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { subject_id } from './config';
-import request from './utils/request';
+import config from './config';
+import request from './api/daniu';
 
 const outputPath = path.resolve(__dirname, '../output');
 
@@ -15,7 +15,7 @@ const getExamPaperPageList = async () => {
     params: {
       page: 1,
       limit: 999,
-      subject_id,
+      subject_id: config.daniu.subject_id,
       plate: 801,
     },
   });
@@ -97,7 +97,7 @@ const generateChoice = (title: string, list: AAA[]) => {
 
   fs.writeFile(path.resolve(outputPath, `${title}.txt`), str, (err) => {
     if (err) {
-      console.log(err)
+      console.log(err);
     }
   });
 };
