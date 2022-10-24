@@ -1,102 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import config from './config';
-import request from './api/daniu';
+import {
+  getExamPaperTopicPageList,
+  getExamPaperPageList2,
+  getExamPaperPageList,
+  getErrorTopicAnalysisPageList, AAA, CategoryName,
+} from './api/daniu';
 
 const outputPath = path.resolve(__dirname, '../output/马克思主义/应用题');
-
-enum CategoryName {
-  CHOICE1 = '单项选择题',
-  CHOICE2 = '单选题',
-  MORE_CHOICE = '多选题',
-  SUBJECTIVE = '主观题',
-  SHORT_ANSWER = '简答题',
-  DISCUSS = '论述题'
-}
-
-const getExamPaperPageList = async () => {
-  const res = await request.get('https://ios.api.daniujiaoyu.org/pc/api/pcweb/exampaper/getexampaperpagelist', {
-    params: {
-      page: 1,
-      limit: 999,
-      subject_id: config.daniu.subject_id,
-      plate: 801,
-    },
-  });
-  return res.data.list as {
-    name: string;
-    sheet_id: string
-  }[];
-};
-
-interface AAA {
-  category_name: CategoryName;
-  topic_no: string;
-  topic_title: string;
-  answer: string;
-  itemList: {}[];
-  analysis: string;
-}
-
-const getErrorTopicAnalysisPageList = async (sheet_id: string) => {
-  const res = await request.get('https://ios.api.daniujiaoyu.org/pc/api/pcweb/answersheet/geterrortopicanalysispagelist', {
-      params: {
-        page: 1,
-        limit: 9999,
-        sheet_id,
-        analysis_type: 2,
-      },
-    },
-  );
-  return res.data as {
-    paper: {
-      name: string
-    },
-    list: AAA[]
-  };
-};
-
-const getExamPaperPageList2 = async () => {
-  const res = await request.get('https://ios.api.daniujiaoyu.org/pc/api/pcweb/exampaper/getexampaperpagelist', {
-    params: {
-      page: 1,
-      limit: 9999,
-      subject_id: config.daniu.subject_id,
-      plate: 802,
-    },
-  }) as {
-    data: {
-      list: {
-        name: string;
-        paper_id: string;
-      }[];
-    }
-  };
-  return res.data.list;
-};
-
-const getExamPaperTopicPageList = async (paper_id: string) => {
-  const res = await request.get('https://ios.api.daniujiaoyu.org/pc/api/pcweb/exampaper/getexampapertopicpagelist', {
-    params: {
-      page: 1,
-      limit: 9999,
-      paper_id,
-    },
-  }) as {
-    data: {
-      paper: {
-        name: string;
-      },
-      list: AAA[]
-    }
-  };
-  return res.data as {
-    paper: {
-      name: string
-    },
-    list: AAA[]
-  };
-};
 
 const getTemplate = (data: any, hasNo = false, type = 0) => {
   const {
@@ -186,7 +97,7 @@ const generateApplied = (title: string, list: AAA[]) => {
   });
 };
 
-!(async function () {
+const daniuExec = async () => {
   const paperList = await getExamPaperPageList();
   paperList.forEach(p => {
     void outputList({
@@ -201,4 +112,8 @@ const generateApplied = (title: string, list: AAA[]) => {
       paper_id: p.paper_id,
     });
   });
+};
+
+!(async function () {
+  await daniuExec();
 })();
