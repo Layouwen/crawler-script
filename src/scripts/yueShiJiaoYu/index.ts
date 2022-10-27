@@ -5,6 +5,17 @@ import { getChapterQuestionIdTypesNoLogin, getQuestionListByIdsNoLogin } from '.
 // 科目 id
 const subcourseId = '628';
 
+const replaceMap = {
+  '<p>': '',
+  '</p>': '',
+  '<br/>': '',
+  '&nbsp;': '',
+  '&quot;': '"',
+  '<span style="color: #333333; font-family: Microsoft YaHei, Arial, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif; font-size: 18px; background-color: #FFFFFF;">': '',
+  '<span style="color: #333333; background-color: #FFFFFF; font-family: arial, helvetica, sans-serif; font-size: 16px;">': '',
+  '</span>': '',
+};
+
 !(async function () {
   const res = await getChapterQuestionIdTypesNoLogin(subcourseId);
   const data = res.data;
@@ -34,7 +45,11 @@ const subcourseId = '628';
     });
   }
 
-  fs.writeFile(path.resolve(__dirname, `output/${name}`), str, (err) => {
+  str = Object.keys(replaceMap).reduce((pre: string, cur: string) => {
+    return pre.replaceAll(cur, '');
+  }, str);
+
+  fs.writeFile(path.resolve(__dirname, `output/${name}.txt`), str, (err) => {
     if (err) {
       console.log(err);
     }
