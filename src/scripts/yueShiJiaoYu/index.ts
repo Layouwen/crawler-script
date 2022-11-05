@@ -1,9 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { getChapterQuestionIdTypesNoLogin, getQuestionListByIdsNoLogin } from '../../api/yueShiJiaoYu';
+import {
+  getChapterQuestionIdTypesNoLogin,
+  getPaperQuestionIdTypes,
+  getQuestionListByIdsNoLogin,
+} from '../../api/yueShiJiaoYu';
 
 // 科目 id
-const subcourseId = '628';
+const subcourseId = '980';
 
 const replaceMap = {
   '<p>': '',
@@ -17,12 +21,15 @@ const replaceMap = {
 };
 
 !(async function () {
-  const res = await getChapterQuestionIdTypesNoLogin(subcourseId);
-  const data = res.data;
-  const chapters = data.V.chapters;
+  const res = await getPaperQuestionIdTypes(subcourseId);
+  const data = res.data
+  const name = data.V.subcourse.name;
+  // const res = await getChapterQuestionIdTypesNoLogin(subcourseId);
+  // const data = res.data;
+  // const chapters = data.V.chapters;
+  const chapters = data.V.papers;
 
   let indexQue = 1;
-  const name = '政治考试题';
   let str = '';
   for (const i of chapters) {
     const questionIdTypes = i.questionIdTypes;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 鉴权 Cookie
-const Cookie = 'JSESSIONID=68148AC6AEADE49664AE0A95399BACF7';
+const Cookie = 'JSESSIONID=052D4A613A7B95D643F139E74D940A9F';
 
 const request = axios.create({headers: {Cookie}});
 
@@ -22,3 +22,14 @@ export const getChapterQuestionIdTypesNoLogin = async (subcourseId: string) => {
     },
   });
 };
+
+export const getPaperQuestionIdTypes = async (subcourseId: string) => {
+  return await request.get('http://huanan-edu.com/tiku/paper/getPaperQuestionIdTypes.do', {
+    params: {
+      subcourseId,
+      PaperTypeId: 1,
+      time: 1667663580000,
+    },
+  });
+};
+
