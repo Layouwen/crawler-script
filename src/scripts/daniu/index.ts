@@ -12,7 +12,7 @@ import { getOutputSubjectPath, nextDir } from "../../config";
 import { createDirFromArr } from "../../utils";
 
 const organizationName = "大牛教育";
-const subjectName = "设计基础";
+const subjectName = "设计原理";
 const subjectDir = getOutputSubjectPath(organizationName, subjectName);
 const paths = [subjectDir];
 
