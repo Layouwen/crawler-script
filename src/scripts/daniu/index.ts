@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as path from "path";
 import { resolve } from "path";
 import {
   getExamPaperTopicPageList,
@@ -9,26 +8,13 @@ import {
   AAA,
   CategoryName,
 } from "../../api/daniu";
-import {
-  getOutputSubjectAppliedProblemPath,
-  getOutputSubjectChoiceQuestionPath,
-  getOutputSubjectPath,
-  outputDaNiuDirPath,
-} from "../../config";
-import { createDir } from "../../utils";
+import { getOutputSubjectPath, nextDir } from "../../config";
+import { createDirFromArr } from "../../utils";
 
 const organizationName = "大牛教育";
 const subjectName = "设计基础";
 const subjectDir = getOutputSubjectPath(organizationName, subjectName);
-const choicePath = getOutputSubjectChoiceQuestionPath(
-  organizationName,
-  subjectName
-);
-const appliedPath = getOutputSubjectAppliedProblemPath(
-  organizationName,
-  subjectName
-);
-const paths = [subjectDir, choicePath, appliedPath];
+const paths = [subjectDir];
 
 const getTemplate = (data: any, hasNo = false, type = 0) => {
   const { topic_no, topic_title, answer, itemList, analysis } = data;
@@ -62,23 +48,31 @@ const getTemplate = (data: any, hasNo = false, type = 0) => {
 };
 
 const outputList = async ({ name = "", sheet_id = "", paper_id = "" }) => {
+  let catePath = "";
+
   let data;
   if (sheet_id) {
+    catePath = nextDir(subjectDir, "章节练习");
     data = await getErrorTopicAnalysisPageList(sheet_id);
   }
   if (paper_id) {
+    catePath = nextDir(subjectDir, "历史真题");
     data = await getExamPaperTopicPageList(paper_id);
   }
+  const choicePath = nextDir(catePath, "选择题");
+  const appliedPath = nextDir(catePath, "应用题");
+  createDirFromArr([catePath, choicePath, appliedPath]);
 
   if (data?.list) {
-    generateChoice(name, data.list);
-    // generateApplied(name, data.list);
+    // 选择题
+    generateChoice(choicePath, name, data.list);
     // 简答题
+    generateApplied(appliedPath, name, data.list);
   }
   return "success";
 };
 
-const generateChoice = (title: string, list: AAA[]) => {
+const generateChoice = (path: string, title: string, list: AAA[]) => {
   const listData = list
     .filter(
       (l) =>
@@ -97,14 +91,14 @@ const generateChoice = (title: string, list: AAA[]) => {
   const str =
     titleStr + listData.map((l) => getTemplate(l, false, 0)).join("\n");
 
-  fs.writeFile(resolve(choicePath, `${title}.txt`), str, (err) => {
+  fs.writeFile(resolve(path, `${title}.txt`), str, (err) => {
     if (err) {
       console.log(err);
     }
   });
 };
 
-const generateApplied = (title: string, list: AAA[]) => {
+const generateApplied = (path: string, title: string, list: AAA[]) => {
   const listData = list
     .filter(
       (l) =>
@@ -122,7 +116,7 @@ const generateApplied = (title: string, list: AAA[]) => {
   const str =
     titleStr + listData.map((l) => getTemplate(l, false, 1)).join("\n");
 
-  fs.writeFile(path.resolve(outputDaNiuDirPath, `${title}.txt`), str, (err) => {
+  fs.writeFile(resolve(path, `${title}.txt`), str, (err) => {
     if (err) {
       console.log(err);
     }
@@ -130,7 +124,7 @@ const generateApplied = (title: string, list: AAA[]) => {
 };
 
 export const daniuExec = async () => {
-  paths.forEach((path) => createDir(path));
+  createDirFromArr(paths);
 
   const paperList = await getExamPaperPageList();
   paperList.forEach((p) => {

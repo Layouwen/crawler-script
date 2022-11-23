@@ -1,5 +1,9 @@
 import { resolve } from "path";
 
+export const nextDir = (path: string, dirName: string) => {
+  return resolve(path, dirName);
+};
+
 export const getOutputOrganizationPath = (name: string) => {
   return resolve(outputDirPath, `${name}`);
 };

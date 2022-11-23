@@ -3,6 +3,10 @@ import logs from "./logs";
 
 export * from "./initDir";
 
+export const createDirFromArr = (arr: string[]) => {
+  arr.forEach((i) => createDir(i));
+};
+
 export const createDir = (path: string) => {
   if (!fs.existsSync(path)) {
     logs.error(`不存在 —— ${path} `);
