@@ -14,3 +14,5 @@ export const createDir = (path: string) => {
     logs.info(`创建 —— ${path}`);
   }
 };
+
+export { logs };
