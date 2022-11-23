@@ -7,14 +7,12 @@ import {
   getErrorTopicAnalysisPageList,
   AAA,
   CategoryName,
+  getStudentTopicSubject,
 } from "../../api/daniu";
 import { getOutputSubjectPath, nextDir } from "../../config";
-import { createDirFromArr } from "../../utils";
+import { createDir, createDirFromArr } from "../../utils";
 
 const organizationName = "大牛教育";
-const subjectName = "设计原理";
-const subjectDir = getOutputSubjectPath(organizationName, subjectName);
-const paths = [subjectDir];
 
 const getTemplate = (data: any, hasNo = false, type = 0) => {
   const { topic_no, topic_title, answer, itemList, analysis } = data;
@@ -47,7 +45,14 @@ const getTemplate = (data: any, hasNo = false, type = 0) => {
   }
 };
 
-const outputList = async ({ name = "", sheet_id = "", paper_id = "" }) => {
+const outputList = async ({
+  subjectName = "",
+  name = "",
+  sheet_id = "",
+  paper_id = "",
+}) => {
+  const subjectDir = getOutputSubjectPath(organizationName, subjectName);
+  createDir(subjectDir);
   let catePath = "";
 
   let data;
@@ -124,20 +129,26 @@ const generateApplied = (path: string, title: string, list: AAA[]) => {
 };
 
 export const daniuExec = async () => {
-  createDirFromArr(paths);
+  const subjectList = await getStudentTopicSubject();
+  for (const subject of subjectList) {
+    const subjectId = subject.subject_id;
+    const subjectName = subject.subject_name;
 
-  const paperList = await getExamPaperPageList();
-  paperList.forEach((p) => {
-    void outputList({
-      name: p.name,
-      sheet_id: p.sheet_id,
+    const paperList = await getExamPaperPageList(subjectId);
+    paperList.forEach((p) => {
+      void outputList({
+        subjectName,
+        name: p.name,
+        sheet_id: p.sheet_id,
+      });
     });
-  });
-  const data = await getExamPaperPageList2();
-  data.forEach((p) => {
-    void outputList({
-      name: p.name,
-      paper_id: p.paper_id,
+    const data = await getExamPaperPageList2(subjectId);
+    data.forEach((p) => {
+      void outputList({
+        subjectName,
+        name: p.name,
+        paper_id: p.paper_id,
+      });
     });
-  });
+  }
 };
