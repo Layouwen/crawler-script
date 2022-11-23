@@ -1,28 +1,48 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
+import { resolve } from "path";
 import {
   getExamPaperTopicPageList,
   getExamPaperPageList2,
   getExamPaperPageList,
-  getErrorTopicAnalysisPageList, AAA, CategoryName,
-} from '../../api/daniu';
+  getErrorTopicAnalysisPageList,
+  AAA,
+  CategoryName,
+} from "../../api/daniu";
+import {
+  getOutputSubjectAppliedProblemPath,
+  getOutputSubjectChoiceQuestionPath,
+  getOutputSubjectPath,
+  outputDaNiuDirPath,
+} from "../../config";
+import { createDir } from "../../utils";
 
-const outputPath = path.resolve(__dirname, '../output/马克思主义/应用题');
+const organizationName = "大牛教育";
+const subjectName = "设计基础";
+const subjectDir = getOutputSubjectPath(organizationName, subjectName);
+const choicePath = getOutputSubjectChoiceQuestionPath(
+  organizationName,
+  subjectName
+);
+const appliedPath = getOutputSubjectAppliedProblemPath(
+  organizationName,
+  subjectName
+);
+const paths = [subjectDir, choicePath, appliedPath];
 
 const getTemplate = (data: any, hasNo = false, type = 0) => {
-  const {
-    topic_no,
-    topic_title,
-    answer,
-    itemList,
-    analysis,
-  } = data;
+  const { topic_no, topic_title, answer, itemList, analysis } = data;
   if (type === 0) {
-    let title = `${topic_title}（${answer.join('').toString()}）\n`;
+    let title = `${topic_title}（${answer.join("").toString()}）\n`;
     if (hasNo) {
       title = `${topic_no}、` + title;
     }
-    const items = itemList.map((i: { item_no: string; content: string; }) => `${i.item_no} ${i.content}\n`).join('');
+    const items = itemList
+      .map(
+        (i: { item_no: string; content: string }) =>
+          `${i.item_no} ${i.content}\n`
+      )
+      .join("");
     const bottom = `解析：${analysis}\n`;
     return title + items + bottom;
   } else if (type === 1) {
@@ -30,17 +50,18 @@ const getTemplate = (data: any, hasNo = false, type = 0) => {
     if (hasNo) {
       title = `${topic_no}、` + title;
     }
-    const items = itemList.map((i: { item_no: string; content: string; }) => `${i.item_no} ${i.content}\n`).join('');
-    const bottom = `答案：${answer.join('').toString()}\n`;
+    const items = itemList
+      .map(
+        (i: { item_no: string; content: string }) =>
+          `${i.item_no} ${i.content}\n`
+      )
+      .join("");
+    const bottom = `答案：${answer.join("").toString()}\n`;
     return title + items + bottom;
   }
 };
 
-const outputList = async ({name = '', sheet_id = '', paper_id = ''}) => {
-  if (!fs.existsSync(outputPath)) {
-    fs.mkdirSync(outputPath);
-  }
-
+const outputList = async ({ name = "", sheet_id = "", paper_id = "" }) => {
   let data;
   if (sheet_id) {
     data = await getErrorTopicAnalysisPageList(sheet_id);
@@ -50,17 +71,22 @@ const outputList = async ({name = '', sheet_id = '', paper_id = ''}) => {
   }
 
   if (data?.list) {
-    // generateChoice(name, data.list);
-    generateApplied(name, data.list);
+    generateChoice(name, data.list);
+    // generateApplied(name, data.list);
     // 简答题
   }
-  return 'success';
+  return "success";
 };
 
 const generateChoice = (title: string, list: AAA[]) => {
   const listData = list
-    .filter(l => l.category_name.includes(CategoryName.CHOICE1) || l.category_name.includes(CategoryName.CHOICE2) || l.category_name.includes(CategoryName.MORE_CHOICE))
-    .map(({topic_no, topic_title, answer, itemList, analysis}) => ({
+    .filter(
+      (l) =>
+        l.category_name.includes(CategoryName.CHOICE1) ||
+        l.category_name.includes(CategoryName.CHOICE2) ||
+        l.category_name.includes(CategoryName.MORE_CHOICE)
+    )
+    .map(({ topic_no, topic_title, answer, itemList, analysis }) => ({
       topic_no,
       topic_title,
       answer,
@@ -68,9 +94,10 @@ const generateChoice = (title: string, list: AAA[]) => {
       analysis,
     }));
   const titleStr = `${title}（选择题）\n\n`;
-  const str = titleStr + listData.map(l => getTemplate(l, false, 0)).join('\n');
+  const str =
+    titleStr + listData.map((l) => getTemplate(l, false, 0)).join("\n");
 
-  fs.writeFile(path.resolve(outputPath, `${title}.txt`), str, (err) => {
+  fs.writeFile(resolve(choicePath, `${title}.txt`), str, (err) => {
     if (err) {
       console.log(err);
     }
@@ -79,8 +106,12 @@ const generateChoice = (title: string, list: AAA[]) => {
 
 const generateApplied = (title: string, list: AAA[]) => {
   const listData = list
-    .filter(l => l.category_name.includes(CategoryName.DISCUSS) || l.category_name.includes(CategoryName.SHORT_ANSWER))
-    .map(({topic_no, topic_title, answer, itemList, analysis}) => ({
+    .filter(
+      (l) =>
+        l.category_name.includes(CategoryName.DISCUSS) ||
+        l.category_name.includes(CategoryName.SHORT_ANSWER)
+    )
+    .map(({ topic_no, topic_title, answer, itemList, analysis }) => ({
       topic_no,
       topic_title,
       answer,
@@ -88,9 +119,10 @@ const generateApplied = (title: string, list: AAA[]) => {
       analysis,
     }));
   const titleStr = `${title}\n\n`;
-  const str = titleStr + listData.map(l => getTemplate(l, false, 1)).join('\n');
+  const str =
+    titleStr + listData.map((l) => getTemplate(l, false, 1)).join("\n");
 
-  fs.writeFile(path.resolve(outputPath, `${title}.txt`), str, (err) => {
+  fs.writeFile(path.resolve(outputDaNiuDirPath, `${title}.txt`), str, (err) => {
     if (err) {
       console.log(err);
     }
@@ -98,15 +130,17 @@ const generateApplied = (title: string, list: AAA[]) => {
 };
 
 export const daniuExec = async () => {
+  paths.forEach((path) => createDir(path));
+
   const paperList = await getExamPaperPageList();
-  paperList.forEach(p => {
+  paperList.forEach((p) => {
     void outputList({
       name: p.name,
       sheet_id: p.sheet_id,
     });
   });
   const data = await getExamPaperPageList2();
-  data.forEach(p => {
+  data.forEach((p) => {
     void outputList({
       name: p.name,
       paper_id: p.paper_id,

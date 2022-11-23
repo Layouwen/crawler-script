@@ -1,5 +1,11 @@
-import { daniuExec } from './scripts/daniu';
+import { daniuExec } from "./scripts/daniu";
+import { initAllDir } from "./utils";
+
+const execMain = {
+  daniuExec,
+};
 
 !(async function () {
-  await daniuExec();
+  initAllDir();
+  await execMain.daniuExec();
 })();
