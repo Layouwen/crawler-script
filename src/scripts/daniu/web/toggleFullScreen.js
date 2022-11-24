@@ -1,22 +1,34 @@
-const $video = document.querySelector(".pv-video-player");
-const $style = document.createElement("style");
+// ==UserScript==
+// @name         大牛教育控件
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  切换窗口全屏的控件
+// @author       Avan
+// @match        https://os.daniujiaoyu.org/html/live/liveRepeat*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=daniujiaoyu.org
+// @grant        none
+// ==/UserScript==
 
-const removeStyleItem = [
-  {
-    key: "width",
-    value: "700px",
-  },
-  {
-    key: "height",
-    value: "435px",
-  },
-];
+setTimeout(() => {
+  const $video = document.querySelector(".pv-video-player");
+  const $style = document.createElement("style");
 
-// add style
-const customVideoWrapperClassName = "custom-video-wrapper";
-const customControlClassName = "custom-control";
+  const removeStyleItem = [
+    {
+      key: "width",
+      value: "700px",
+    },
+    {
+      key: "height",
+      value: "435px",
+    },
+  ];
 
-$style.innerHTML = `
+  // add style
+  const customVideoWrapperClassName = "custom-video-wrapper";
+  const customControlClassName = "custom-control";
+
+  $style.innerHTML = `
 .${customVideoWrapperClassName} {
     z-index: 99999;
     position: fixed;
@@ -44,27 +56,28 @@ $style.innerHTML = `
     -khtml-user-select:none; /*早期浏览器*/
     user-select:none;
     cursor: pointer;
-} 
+}
 `;
-document.head.appendChild($style);
+  document.head.appendChild($style);
 
-// add control
-const $control = document.createElement("div");
-$control.classList.add(customControlClassName);
-$control.innerHTML = `全屏`;
-let isFull = false;
-$control.onclick = () => {
-  if (isFull) {
-    $video.classList.remove(customVideoWrapperClassName);
-    removeStyleItem.forEach((item) =>
-      $video.style.setProperty(item.key, item.value)
-    );
-    $control.innerHTML = `全屏`;
-  } else {
-    $video.classList.add(customVideoWrapperClassName);
-    removeStyleItem.forEach((item) => $video.style.removeProperty(item.key));
-    $control.innerHTML = `窗口`;
-  }
-  isFull = !isFull;
-};
-document.body.appendChild($control);
+  // add control
+  const $control = document.createElement("div");
+  $control.classList.add(customControlClassName);
+  $control.innerHTML = `全屏`;
+  let isFull = false;
+  $control.onclick = () => {
+    if (isFull) {
+      $video.classList.remove(customVideoWrapperClassName);
+      removeStyleItem.forEach((item) =>
+        $video.style.setProperty(item.key, item.value)
+      );
+      $control.innerHTML = `全屏`;
+    } else {
+      $video.classList.add(customVideoWrapperClassName);
+      removeStyleItem.forEach((item) => $video.style.removeProperty(item.key));
+      $control.innerHTML = `窗口`;
+    }
+    isFull = !isFull;
+  };
+  document.body.appendChild($control);
+}, 2000);
