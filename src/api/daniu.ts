@@ -29,6 +29,7 @@ export const getExamPaperPageList = async (subjectId: string) => {
   return res.data.list as {
     name: string;
     sheet_id: string;
+    done_count: number;
   }[];
 };
 
@@ -68,6 +69,7 @@ export const getExamPaperPageList2 = async (subjectId: string) => {
       list: {
         name: string;
         paper_id: string;
+        done_count: number;
       }[];
     };
   };
@@ -100,12 +102,33 @@ export const getExamPaperTopicPageList = async (paper_id: string) => {
   };
 };
 
+export const addAnswerSheet = (data: {
+  paper_id: string;
+  item_list: {
+    exam_topic_id: string;
+    stu_answer: string[];
+    paper_topic_id: string;
+  }[];
+}) => {
+  return request.post(
+    "https://ios.api.daniujiaoyu.org/pc/api/pcweb/answersheet/addanswersheet",
+    {
+      state: 1,
+      expand_second: 10,
+      last_topic_no: 0,
+      ...data,
+    }
+  );
+};
+
 export default request;
 
 export enum CategoryName {
   CHOICE1 = "单项选择题",
   CHOICE2 = "单选题",
-  MORE_CHOICE = "多选题",
+  CHOICE3 = "单选",
+  MORE_CHOICE1 = "多选题",
+  MORE_CHOICE2 = "多选",
   SUBJECTIVE = "主观题",
   SHORT_ANSWER = "简答题",
   DISCUSS = "论述题",
@@ -118,4 +141,6 @@ export interface AAA {
   answer: string;
   itemList: {}[];
   analysis: string;
+  exam_topic_id: string;
+  paper_topic_id: string;
 }

@@ -2,6 +2,6 @@ export * from "./path";
 
 export default {
   daniu: {
-    token: "gELaDwh_1eXYtSf6PcQeruXBGaN-cNoUuwqE7olxYxw",
+    token: "kvK1R1q_aljncUiKEwQo0C5Wdc093QdWVDoHYe8N-Sk",
   },
 };
