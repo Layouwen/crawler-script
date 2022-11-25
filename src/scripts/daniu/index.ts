@@ -11,6 +11,8 @@ import {
 } from "../../api/daniu";
 import { getOutputSubjectPath, nextDir } from "../../config";
 import { createDir, createDirFromArr } from "../../utils";
+import logs from "./logs";
+import * as path from "path";
 
 const organizationName = "大牛教育";
 
@@ -57,12 +59,22 @@ const outputList = async ({
 
   let data;
   if (sheet_id) {
-    catePath = nextDir(subjectDir, "章节练习");
-    data = await getErrorTopicAnalysisPageList(sheet_id);
+    try {
+      catePath = nextDir(subjectDir, "章节练习");
+      data = await getErrorTopicAnalysisPageList(sheet_id);
+      logs.info(`爬取章节练习成功 ${sheet_id} ${subjectName} ${name}`);
+    } catch (e) {
+      logs.error(`爬取章节练习失败 ${sheet_id} ${subjectName} ${name}`);
+    }
   }
   if (paper_id) {
-    catePath = nextDir(subjectDir, "历史真题");
-    data = await getExamPaperTopicPageList(paper_id);
+    try {
+      catePath = nextDir(subjectDir, "历史真题");
+      data = await getExamPaperTopicPageList(paper_id);
+      logs.info(`爬取历史真题成功 ${paper_id} ${subjectName} ${name}`);
+    } catch (e) {
+      logs.error(`爬取历史真题失败 ${paper_id} ${subjectName} ${name}`);
+    }
   }
   const choicePath = nextDir(catePath, "选择题");
   const appliedPath = nextDir(catePath, "应用题");
