@@ -11,6 +11,8 @@ import {
 } from "../../api/daniu";
 import { getOutputSubjectPath, nextDir } from "../../config";
 import { createDir, createDirFromArr } from "../../utils";
+import logs from "./logs";
+import finishExam from "./finishExam";
 
 const organizationName = "大牛教育";
 
@@ -57,12 +59,22 @@ const outputList = async ({
 
   let data;
   if (sheet_id) {
-    catePath = nextDir(subjectDir, "章节练习");
-    data = await getErrorTopicAnalysisPageList(sheet_id);
+    try {
+      catePath = nextDir(subjectDir, "章节练习");
+      data = await getErrorTopicAnalysisPageList(sheet_id);
+      logs.info(`爬取章节练习成功 ${sheet_id} ${subjectName} ${name}`);
+    } catch (e) {
+      logs.error(`爬取章节练习失败 ${sheet_id} ${subjectName} ${name}`);
+    }
   }
   if (paper_id) {
-    catePath = nextDir(subjectDir, "历史真题");
-    data = await getExamPaperTopicPageList(paper_id);
+    try {
+      catePath = nextDir(subjectDir, "历史真题");
+      data = await getExamPaperTopicPageList(paper_id);
+      logs.info(`爬取历史真题成功 ${paper_id} ${subjectName} ${name}`);
+    } catch (e) {
+      logs.error(`爬取历史真题失败 ${paper_id} ${subjectName} ${name}`);
+    }
   }
   const choicePath = nextDir(catePath, "选择题");
   const appliedPath = nextDir(catePath, "应用题");
@@ -83,7 +95,9 @@ const generateChoice = (path: string, title: string, list: AAA[]) => {
       (l) =>
         l.category_name.includes(CategoryName.CHOICE1) ||
         l.category_name.includes(CategoryName.CHOICE2) ||
-        l.category_name.includes(CategoryName.MORE_CHOICE)
+        l.category_name.includes(CategoryName.CHOICE3) ||
+        l.category_name.includes(CategoryName.MORE_CHOICE1) ||
+        l.category_name.includes(CategoryName.MORE_CHOICE2)
     )
     .map(({ topic_no, topic_title, answer, itemList, analysis }) => ({
       topic_no,
@@ -129,13 +143,23 @@ const generateApplied = (path: string, title: string, list: AAA[]) => {
 };
 
 export const daniuExec = async () => {
+  const needSubjectCName = ["设计基础", "设计原理"];
   const subjectList = await getStudentTopicSubject();
-  for (const subject of subjectList) {
+  const needSubject = subjectList.filter((s: any) =>
+    needSubjectCName.includes(s.subject_name)
+  );
+  for (const subject of needSubject) {
     const subjectId = subject.subject_id;
     const subjectName = subject.subject_name;
 
     const paperList = await getExamPaperPageList(subjectId);
     paperList.forEach((p) => {
+      if (p.done_count === 0) {
+        finishExam({
+          subjectName,
+          ...p,
+        });
+      }
       void outputList({
         subjectName,
         name: p.name,
@@ -144,6 +168,12 @@ export const daniuExec = async () => {
     });
     const data = await getExamPaperPageList2(subjectId);
     data.forEach((p) => {
+      if (p.done_count === 0) {
+        finishExam({
+          subjectName,
+          ...p,
+        });
+      }
       void outputList({
         subjectName,
         name: p.name,

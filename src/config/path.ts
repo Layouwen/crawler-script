@@ -15,6 +15,7 @@ export const getOutputSubjectPath = (name: string, subjectName: string) => {
 // base dir
 export const outputDirPath = resolve(__dirname, "../../output");
 export const logsDirPath = resolve(__dirname, "../../logs");
+export const logsDaNiuDirPath = nextDir(logsDirPath, "大牛教育");
 
 // category dir
 export const outputDaNiuDirPath = getOutputOrganizationPath("大牛教育");
