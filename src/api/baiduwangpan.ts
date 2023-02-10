@@ -1,5 +1,5 @@
 import axios from "axios";
-import config from '../config';
+import { getConfigJson } from "../scripts/baiduwangpan/utils";
 
 type NUmberOrString = number | string;
 
@@ -27,6 +27,7 @@ export interface ListItem {
 }
 
 export const getListApi = (params: GetListApi) => {
+  const { cookie } = getConfigJson();
   return axios.get("https://pan.baidu.com/api/list", {
     params: {
       clienttype: 0,
@@ -37,6 +38,6 @@ export const getListApi = (params: GetListApi) => {
       desc: Order.ASC,
       ...params,
     },
-    headers: { Cookie: config.baiduwangpan.cookie },
+    headers: { Cookie: cookie },
   });
 };

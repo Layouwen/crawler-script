@@ -1,16 +1,13 @@
 # Crawler & Script
 
-- [DaNiu](./src/scripts/daniu/README.md)
-- [WenJuanXing](./src/scripts/wenJuanXing/README.md)
-- [KongGeJiaoYu](./src/scripts/kongGeJiaoYu/README.md)
-- [YueShiJiaoYu](./src/scripts/yueShiJiaoYu/README.md)
+## [DaNiu](./src/scripts/daniu/README.md)
 
-# Usage
+## [WenJuanXing](./src/scripts/wenJuanXing/README.md)
 
-```bash
-pnpm i
+## [KongGeJiaoYu](./src/scripts/kongGeJiaoYu/README.md)
 
-copy src/config/index.default.ts src/config/index.ts
-```
+## [YueShiJiaoYu](./src/scripts/yueShiJiaoYu/README.md)
 
-Complements `src/config/index.ts`
+## [BaiDuWangPan](./src/scripts/baiduwangpan/README.md)
+
+![](./assets/gif/baiduwangpan.gif)
