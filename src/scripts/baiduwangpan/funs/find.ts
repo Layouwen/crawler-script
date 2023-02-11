@@ -62,7 +62,6 @@ export function findDiscontinuous() {
     console.log(c.red(`你缺少了 ${order} 号文件`));
   }
   for (const name of unnumbered) {
-    console.log(`
-    你有未命名的文件 ${name}`);
+    console.log(c.blue(`你有未命名的文件 ${name}`));
   }
 }
