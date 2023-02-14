@@ -10,6 +10,7 @@ import {
 interface Config {
   cookie?: string;
   outputDirPath: string;
+  alias?: Record<string, string>;
 }
 
 export function isNumber(v: string | number) {
@@ -34,5 +35,25 @@ export function setDataJson(list: ListItem[]) {
 
 export function setObsidianDataJson(v: string) {
   const { outputDirPath } = getConfigJson();
-  fs.writeFileSync(getObsidianDataPath(outputDirPath || defaultOutputDirPath), v);
+  fs.writeFileSync(
+    getObsidianDataPath(outputDirPath || defaultOutputDirPath),
+    v
+  );
+}
+
+export function getAliasPath(alias: string) {
+  const config = getConfigJson();
+  return config.alias?.[alias];
+}
+
+export function setAlias(path: string, alias: string) {
+  const config = getConfigJson();
+
+  if (!config.alias) {
+    config.alias = {};
+  }
+
+  config.alias[alias] = path;
+
+  setConfigJson(config);
 }

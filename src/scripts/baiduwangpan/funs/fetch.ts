@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import c from "picocolors";
 import { getListApi, ListItem } from "../../../api/baiduwangpan";
-import { getConfigJson, setDataJson } from "../utils";
+import { getAliasPath, getConfigJson, setDataJson } from "../utils";
 
 function getNames(list: ListItem[]) {
   return list.map(({ server_filename, isdir, path }) => ({
@@ -19,7 +19,7 @@ async function getDirInquire() {
       message: "输入目录",
     },
   ]);
-  return answer.dir;
+  return answer.dir as string;
 }
 
 export async function fetchDataFromDir() {
@@ -28,8 +28,21 @@ export async function fetchDataFromDir() {
     console.log(c.red("请先设置cookie"));
     return;
   }
-  const dir = await getDirInquire();
-  const { data: listData } = await getListApi({ dir, num: 500, page: 1 });
+  let dir = await getDirInquire();
+
+  if (dir.startsWith("@")) {
+    const aliasPath = getAliasPath(dir.slice(1));
+    if (aliasPath) {
+      dir = aliasPath;
+      console.log(c.green(`别名解析完成：${aliasPath}`));
+    }
+  }
+
+  const { data: listData } = await getListApi({
+    dir,
+    num: 500,
+    page: 1,
+  });
   const { list } = listData;
   const names = getNames(list);
   setDataJson(names);

@@ -3,6 +3,7 @@ import { getDataJson, setObsidianDataJson } from "../utils";
 export * from "./fetch";
 export * from "./setCookie";
 export * from "./find";
+export * from "./settings";
 
 export function genObsidianData() {
   const data = getDataJson();
