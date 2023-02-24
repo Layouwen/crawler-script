@@ -1,0 +1,23 @@
+{
+  "name": "mqttClient",
+  "version": "1.0.0",
+  "description": "",
+  "bin": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mqtt": "^4.3.7"
+  },
+  "pkg": {
+    "scripts": [],
+    "assets": [],
+    "targets": [
+      "node16-alpine-x64"
+    ],
+    "outputPath": "bin"
+  }
+}
