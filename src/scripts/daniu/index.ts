@@ -13,6 +13,7 @@ import { getOutputSubjectPath, nextDir } from "../../config";
 import { createDir, createDirFromArr } from "../../utils";
 import logs from "./logs";
 import finishExam from "./finishExam";
+import { convert } from "html-to-text";
 
 const organizationName = "大牛教育";
 
@@ -26,7 +27,7 @@ const getTemplate = (data: any, hasNo = false, type = 0) => {
     const items = itemList
       .map(
         (i: { item_no: string; content: string }) =>
-          `${i.item_no} ${i.content}\n`
+          `${i.item_no} ${convert(i.content)}\n`
       )
       .join("");
     const bottom = `解析：${analysis}\n`;
@@ -42,7 +43,7 @@ const getTemplate = (data: any, hasNo = false, type = 0) => {
           `${i.item_no} ${i.content}\n`
       )
       .join("");
-    const bottom = `答案：${answer.join("").toString()}\n`;
+    const bottom = `答案：${convert(answer.join("").toString())}\n`;
     return title + items + bottom;
   }
 };

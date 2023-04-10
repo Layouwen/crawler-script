@@ -37,6 +37,8 @@ async function main() {
     });
   }
 
+  const downloadFinishMap = new Map()
+
   for (const key in d3StyleJson) {
     for (const item of d3StyleJson[key]) {
       for (const model of item.models) {
@@ -55,11 +57,14 @@ async function main() {
         ];
 
         for (const item of fileInfo) {
+          if (!downloadFinishMap.has(item.filename)) {
           await save3DModel(
             item.url,
             path.resolve(threeDDirPath, item.filename)
           );
+          downloadFinishMap.set(item.filename, true)
           console.log(item.filename, item.url, "下载完成");
+          }
         }
       }
     }
