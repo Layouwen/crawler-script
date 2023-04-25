@@ -12,6 +12,7 @@
 // video.requestFullscreen();
 
 function onKeydownListener(e) {
+  const iframe = window.frames[0].frameElement.contentDocument
   const liArr = Array.from(window.document.querySelector('.movurl[style="display: block;"]').querySelectorAll('li'))
   const curIndex = liArr.findIndex(li => li.innerHTML.includes('background:'))
   let preIndex = -1,
