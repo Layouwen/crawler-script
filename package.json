@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node ./src/index.ts",
-    "baiduwangpan": "ts-node src/scripts/baiduwangpan/index.ts"
+    "baiduwangpan": "ts-node src/scripts/baiduwangpan/index.ts",
+    "readme:update": "bun run ./scripts/updateReadMe.js"
   },
   "keywords": [],
   "author": "",

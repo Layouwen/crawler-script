@@ -1,6 +1,6 @@
-# 粤师教育
+## 粤师教育
 
-## 爬取科目所有章节练习
+### 爬取科目所有章节练习
 
 修改 `api/yueShiJiaoYu.ts` 中的 `Cookie`
 修改 `index.ts` 里面的 `subcourseId` 为对应科目的 id 号

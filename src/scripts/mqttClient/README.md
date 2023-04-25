@@ -1,4 +1,4 @@
-# MQTT Client
+## MQTT Client
 
 ```bash
 node main.js <host> <port> <protocol> <topic> <msg>
