@@ -4,3 +4,6 @@ node_modules
 output
 /logs
 src/config/index.ts
+.DS_store
+
+_work_
