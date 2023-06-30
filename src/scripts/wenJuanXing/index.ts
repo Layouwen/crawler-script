@@ -1,7 +1,9 @@
+// 过滤不需要的题目
 const questionTypeArr = [
   '【熟记】',
   '【必会】',
   '【理解】',
+  '【领会】',
 ];
 const right = '';
 
@@ -10,6 +12,10 @@ const $items = document.querySelectorAll('.data__items');
 Array.from($items).forEach(i => {
   const $title = i.querySelector('.data__tit_cjd');
   let title;
+
+  // 处理没选项的情况
+  if (!($title && $title.childNodes)) return
+
   if ($title.childNodes[0].tagName === 'LABEL') {
     title = $title.childNodes[1].data;
   } else {
