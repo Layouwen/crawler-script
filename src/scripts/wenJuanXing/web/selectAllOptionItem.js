@@ -14,5 +14,8 @@ $allRadioWrapper.forEach((i) => {
   i.childNodes[0].click();
 });
 
-document.querySelectorAll("textarea").forEach((i) => (i.value = "八楼啊吧"));
-document.querySelectorAll("input").forEach((i) => (i.value = "巴拉巴拉"));
+window.scrollTo(0,99999999)
+
+document.querySelectorAll("textarea.inputtext").forEach((i) => (i.value = "八楼啊吧"));
+
+document.querySelector('#submit_button').click()

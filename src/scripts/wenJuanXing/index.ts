@@ -1,10 +1,16 @@
 // 过滤不需要的题目
-const questionTypeArr = ["【熟记】", "【必会】", "【理解】", "【领会】"];
+const questionTypeArr = [
+  "【熟记】",
+  "【必会】",
+  "【理解】",
+  "【领会】",
+  "【熟悉】",
+];
 const right = "";
 
 let output = "";
 
-output += `${document.querySelector(".score-form__title").innerHTML}\n`;
+output += `${document.querySelector(".score-form__title").innerHTML}\n\n`;
 
 const $items = document.querySelectorAll(".data__items");
 Array.from($items).forEach((i) => {
@@ -55,6 +61,9 @@ Array.from($items).forEach((i) => {
     output += `${title}(${answer})\n`;
     output += options.join("\n") + "\n";
     if (jiexi) {
+      while (jiexi.includes("\n")) {
+        jiexi = jiexi.replaceAll("\n", "");
+      }
       output += `解析：${jiexi}\n`;
     }
     output += "\n";
