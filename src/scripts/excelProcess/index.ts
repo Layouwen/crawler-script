@@ -1,14 +1,9 @@
 import xlsx from 'node-xlsx'
 import fs from 'fs'
 import path from 'path'
-import mongoose from 'mongoose'
-import config from './config'
-import { Case02 } from './model/Case02'
-
-async function connectMongo(run = false) {
-  if (!run) return
-  await mongoose.connect(config.mongoUrl)
-}
+import { Devices } from './model/Devices'
+import { Media } from './model/Media'
+import './utils/mongo'
 
 async function case01(run = false) {
   if (!run) return
@@ -68,6 +63,8 @@ async function case02(run = false) {
 
   const result = [] as { uuid: string; name: string; url: string }[]
 
+  const nowTime = new Date()
+
   for (const item of sheet.data) {
     const [a, b, c] = item
     if (a && b && c) {
@@ -75,21 +72,46 @@ async function case02(run = false) {
       keyName!.forEach((key, index) => {
         d[key] = item[index]
       })
-      d.opTime = new Date()
-      d.updated = new Date()
+      d.updated = nowTime
       result.push(d)
     }
   }
 
   const test = result.pop()
 
-  await Case02.insertMany([test])
+  const flowDeviceCCTV = result.map(item => {
+    return {
+      ...item,
+      type: 'cctv',
+      setLocation: { region: [] },
+      state: 0,
+      opTime: nowTime,
+      workTime: nowTime,
+    }
+  })
+
+  await Devices.insertMany(flowDeviceCCTV)
+
+  const mediahubDevice = result.map(item => {
+    const { url: streamUrl, ...data } = item
+    return {
+      ...data,
+      type: 'video',
+      streamProtocol: 'rtsp',
+      streamUrl,
+      isRecording: false,
+      created: nowTime,
+    }
+  })
+
+  await Media.insertMany(mediahubDevice)
+
+  console.log('count', flowDeviceCCTV.length, mediahubDevice.length)
 
   console.log('case02 done')
 }
 
 !(async () => {
-  await connectMongo(true)
   // 合成摄像头 rtsp 地址汇总表
   await case01()
   // rtsp 汇总表添加到 mongodb

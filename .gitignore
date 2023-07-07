@@ -7,3 +7,5 @@ src/config/index.ts
 .DS_store
 
 _work_
+
+.env
